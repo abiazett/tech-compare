@@ -210,7 +210,8 @@ def generate_conditional_recommendations(
 def generate_overall_recommendation(
     scenario_scores: Dict[str, Any],
     dimension_scores: Dict[str, Any],
-    technologies: List[str]
+    technologies: List[str],
+    scenarios: List[Dict[str, Any]] = None
 ) -> Dict[str, Any]:
     """Generate overall recommendation based on weighted scores."""
 
@@ -257,12 +258,36 @@ def generate_overall_recommendation(
     # Sort alternatives by score
     alternatives = sorted(alternatives, key=lambda x: x['total_score'], reverse=True)
 
-    return {
+    # Detect winner inconsistency
+    note = None
+    if scenario_winner and dimension_winner and scenario_winner != dimension_winner:
+        note = (
+            f"Note: Scenario-based analysis favors {scenario_winner}, while dimension-based "
+            f"analysis favors {dimension_winner}. Primary recommendation prioritizes your "
+            f"stated scenarios over abstract dimension scoring."
+        )
+
+    # Detect low scenario count with same priority (ambiguous winner)
+    if scenarios and len(scenarios) <= 2:
+        priorities = [s.get('priority', 'IMPORTANT') for s in scenarios]
+        unique_priorities = set(priorities)
+        if len(unique_priorities) == 1 and priorities[0] != 'CRITICAL':
+            if note:
+                note += " Additionally, only 2 scenarios with the same priority level may not provide sufficient differentiation. Consider adding more scenarios or marking one as CRITICAL for clearer recommendations."
+            else:
+                note = "Note: Only 2 scenarios with the same priority level. Consider adding more scenarios or prioritizing one as CRITICAL for clearer recommendations."
+
+    result = {
         "primary": primary,
         "rationale": rationale,
         "alternatives": alternatives[:2],  # Top 2 alternatives
         "confidence": "High" if scenario_scores_data.get(primary, {}).get('critical_wins', 0) > 0 else "Moderate"
     }
+
+    if note:
+        result["note"] = note
+
+    return result
 
 
 def generate_decision_matrix(data: Dict[str, Any]) -> Dict[str, Any]:
@@ -278,7 +303,7 @@ def generate_decision_matrix(data: Dict[str, Any]) -> Dict[str, Any]:
 
     # Generate recommendations
     conditional_recs = generate_conditional_recommendations(scenarios, technologies)
-    overall_rec = generate_overall_recommendation(scenario_scores, dimension_scores, technologies)
+    overall_rec = generate_overall_recommendation(scenario_scores, dimension_scores, technologies, scenarios)
 
     return {
         "scenario_weighted_scores": scenario_scores,

@@ -1,6 +1,6 @@
 ---
 name: tech-compare
-description: Compare 2-3 technologies across user-defined scenarios (ML/AI frameworks, databases, cloud providers, web frameworks, container orchestration, CI/CD, etc.). Auto-discovers alternatives and suggests relevant scenarios. Two modes - Quick (2-4h web research, 14 dimensions) or Deep (1-2 days with project-swot). Generates complete output - markdown report, comparison tables, decision matrix, PowerPoint, PDFs. Evaluates each technology per scenario independently with scenario-specific recommendations (no forced single winner). Trigger on - "Compare X, Y, Z", "Which is better A or B?", "Evaluate [technologies] for [scenario]", "Help me choose between [options]", "Should we use X or Y?".
+description: Compare 2-3 technologies across user-defined scenarios (ML/AI frameworks, databases, cloud providers, web frameworks, container orchestration, CI/CD, etc.). Auto-discovers alternatives and suggests relevant scenarios. Two modes - Quick (1-2h web research, 14 dimensions) or Deep (2-4h with project-swot). Generates complete output - markdown report, comparison tables, decision matrix, PowerPoint, PDFs. Evaluates each technology per scenario independently with scenario-specific recommendations (no forced single winner). Trigger on - "Compare X, Y, Z", "Which is better A or B?", "Evaluate [technologies] for [scenario]", "Help me choose between [options]", "Should we use X or Y?".
 ---
 
 # Technology Comparison
@@ -81,7 +81,7 @@ python3 -c "import pptx; print('python-pptx installed')"
 
 ```
 Step 1: Technology Discovery   → Web search for alternatives, user selects 2-3
-Step 2: Mode Selection         → Quick (2-4h) or Deep (1-2 days with project-swot)
+Step 2: Mode Selection         → Quick (1-2h) or Deep (2-4h with project-swot)
 Step 3: Scenario Definition    → User provides scenarios, skill suggests additional, user confirms
 Step 4: Deep Research          → Quick mode: 14 dimensions analysis
                                  Deep mode: project-swot for each technology (ask Phase 0 questions once, reuse for all)
@@ -131,7 +131,7 @@ Confirm selection before proceeding.
 
 Present two modes to the user:
 
-### Quick Mode (2-4 hours)
+### Quick Mode (1-2 hours)
 - Web research for each technology
 - Analyze across 14 standard comparison dimensions (see `references/comparison-dimensions.md`)
 - Scenario-specific analysis
@@ -142,7 +142,7 @@ Present two modes to the user:
 - Well-understood technology categories
 - Lower-stakes choices
 
-### Deep Mode (1-2 days)
+### Deep Mode (2-4 hours)
 - Run **project-swot skill** for EACH technology (forked subagents)
   - **IMPORTANT:** Ask project-swot Phase 0 context questions (purpose, constraints, success criteria) **ONCE at the beginning**
   - Provide the same context to each project-swot subagent so user doesn't repeat themselves
@@ -157,7 +157,7 @@ Present two modes to the user:
 - Formal vendor evaluations
 - Regulatory/compliance requirements
 
-**Ask user:** "Which mode would you like? Quick (2-4h) or Deep (1-2 days)?"
+**Ask user:** "Which mode would you like? Quick (1-2h) or Deep (2-4h)?"
 
 ---
 
@@ -358,6 +358,60 @@ Load `references/decision-framework-patterns.md` and select appropriate pattern(
 - "Choose Technology C if..."
 
 **Pattern 4-7:** Use as appropriate based on user context.
+
+### 6.1.1: Deep Mode Synthesis Guidelines
+
+**CRITICAL:** When synthesizing Deep Mode results from individual project-swot analyses:
+
+**Scope to User's Scenarios:**
+- Base primary recommendations ONLY on the scenarios the user provided
+- Do NOT expand to additional scenarios without explicit user request
+- If suggesting additional scenarios, clearly separate:
+  - **Primary Recommendation** (based on user's stated scenarios)
+  - **Alternative Strategy** (if considering expanded scenarios)
+
+**Avoid Over-Architecting:**
+- For 2-3 scenarios: Provide **scenario-specific winners** (Pattern 1 + Pattern 3)
+- For 4+ diverse scenarios: Consider **hybrid/platform strategies** (Pattern 4)
+- Do NOT recommend "platform architecture" for simple 2-3 scenario comparisons
+
+**Example - Correct Synthesis for 2 Scenarios:**
+```markdown
+## Recommendations (Based on Your 2 Scenarios)
+
+| Scenario | Best Fit | Why |
+|----------|----------|-----|
+| Rapid R&D Experimentation | AutoGluon | [rationale] |
+| Cost-Optimized ML | FLAML + Ray Tune | [rationale] |
+
+**Recommendation:**
+- If you prioritize Scenario 1 → Choose AutoGluon
+- If you prioritize Scenario 2 → Choose FLAML
+- If you need both → Consider deploying both technologies for different use cases
+
+---
+
+## Alternative: Multi-Technology Platform (Optional)
+
+If your needs extend beyond these 2 scenarios to include [list additional
+scenarios like LLM fine-tuning, multi-tenant platform, etc.], consider a
+platform approach with technology routing based on workload characteristics.
+
+[Platform architecture details here]
+```
+
+**Align with Individual SWOTs:**
+- Each technology's role in synthesis should match its individual SWOT recommendation
+- If individual SWOT says "ADOPT" → synthesis should recommend adoption
+- If discrepancy exists, explicitly explain why:
+
+```markdown
+Technology | Individual SWOT | Synthesis Role | Alignment
+-----------|----------------|----------------|----------
+Tech A     | MAINTAIN       | High-Accuracy  | ✅ Consistent
+Tech B     | ADOPT          | Distributed    | ✅ Consistent
+Tech C     | EVALUATE       | Resource-Eff.  | ⚠️ Note: Wins "Cost-Optimized" scenario but marked EVALUATE due to [reason]
+```
 
 ### 6.2: Acknowledge Trade-Offs
 

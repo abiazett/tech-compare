@@ -8,7 +8,7 @@ Tech-Compare helps you make informed technology decisions by:
 - Comparing technologies across **your specific scenarios** (not forced general recommendations)
 - Using **forked subagents** to prevent bias (separate positive/negative analysis)
 - Generating **comprehensive deliverables** (reports, tables, presentations, PDFs)
-- Supporting **two depth levels**: Quick (2-4h web research) or Deep (1-2 days with full SWOT analysis)
+- Supporting **two depth levels**: Quick (1-2h web research) or Deep (2-4h with full SWOT analysis)
 
 **Core Principle:** In technology comparisons, there is rarely a single "winner" across all scenarios. Different technologies excel at different use cases. This skill helps you understand **which technology fits which scenario**.
 
@@ -16,7 +16,7 @@ Tech-Compare helps you make informed technology decisions by:
 
 ## Two Analysis Modes
 
-### Quick Mode (2-4 hours)
+### Quick Mode (1-2 hours)
 
 **Best for:**
 - Time-constrained decisions
@@ -38,7 +38,7 @@ Tech-Compare helps you make informed technology decisions by:
 
 ---
 
-### Deep Mode (1-2 days)
+### Deep Mode (2-4 hours)
 
 **Best for:**
 - High-stakes decisions (major technology investments)
