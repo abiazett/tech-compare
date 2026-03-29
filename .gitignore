@@ -1,0 +1,31 @@
+# MacOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Test outputs
+test-*/
+*_test/
+output/
+*.pdf
+*.pptx
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary files
+*.tmp
+*.bak
+*~
