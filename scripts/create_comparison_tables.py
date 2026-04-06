@@ -38,6 +38,49 @@ import sys
 from typing import Dict, List, Any
 
 
+def normalize_data(data: Dict[str, Any]) -> Dict[str, Any]:
+    """Normalize input data to handle both flat and rich JSON formats.
+
+    Handles:
+    - technologies as list of strings OR list of dicts with 'name' key
+    - dimensions with 'scores' dict OR 'comparisons' with 'numeric_score'
+    - dimensions with or without 'weight' (defaults to IMPORTANT)
+    - scenarios mapped to scenario_analysis format
+    """
+    data = dict(data)  # shallow copy
+
+    # Normalize technologies: list of dicts -> list of strings
+    techs = data.get('technologies', [])
+    if techs and isinstance(techs[0], dict):
+        data['technologies'] = [t.get('name', str(t)) for t in techs]
+
+    # Normalize dimensions
+    for dim in data.get('dimensions', []):
+        if 'weight' not in dim:
+            dim['weight'] = 'IMPORTANT'
+
+        # Convert 'scores' dict to 'comparisons' format
+        if 'scores' in dim and 'comparisons' not in dim:
+            dim['comparisons'] = {}
+            for tech, score in dim['scores'].items():
+                label = 'Excellent' if score >= 9 else 'Strong' if score >= 7 else 'Moderate' if score >= 5 else 'Limited' if score >= 3 else 'Weak'
+                dim['comparisons'][tech] = {'score': label, 'numeric_score': score}
+
+    # Normalize scenarios to scenario_analysis format
+    if 'scenarios' in data and 'scenario_analysis' not in data:
+        data['scenario_analysis'] = []
+        for s in data['scenarios']:
+            data['scenario_analysis'].append({
+                'scenario': s.get('name', s.get('scenario', 'Unknown')),
+                'priority': s.get('priority', 'IMPORTANT'),
+                'best_fit': s.get('best_fit', 'N/A'),
+                'runner_up': s.get('runner_up', 'N/A'),
+                'rationale': s.get('rationale', '')
+            })
+
+    return data
+
+
 def generate_dimension_table(dimension: Dict[str, Any], technologies: List[str]) -> str:
     """Generate a comparison table for a single dimension."""
     lines = []
@@ -253,6 +296,9 @@ def main():
     except json.JSONDecodeError as e:
         print(f"Error: Invalid JSON in input file: {e}")
         sys.exit(1)
+
+    # Normalize data to handle both flat and rich formats
+    data = normalize_data(data)
 
     # Generate markdown
     markdown = generate_full_comparison_markdown(data)

@@ -87,7 +87,10 @@ Step 4: Deep Research          → Quick mode: 14 dimensions analysis
                                  Deep mode: project-swot for each technology (ask Phase 0 questions once, reuse for all)
 Step 5: Context Integration    → User provides optional context files (meeting notes, requirements)
 Step 6: Synthesis              → Per-scenario recommendations using decision framework patterns
+                                 Self-validation loop (consistency, fairness, baseline drift)
+                                 Decision reversal criteria generation
 Step 7: Output Generation      → Markdown report, tables, decision matrix, presentation, PDFs
+                                 Includes dissenting viewpoints and optional cost quantification
 ```
 
 ---
@@ -246,6 +249,8 @@ Load `references/comparison-dimensions.md` and evaluate each technology:
 
 For each dimension, score each technology and provide notes.
 
+**IMPORTANT:** For every feature or capability listed, tag as `[OSS]` or `[PAID/COMMERCIAL]` to distinguish freely available open-source functionality from paid/commercial-only features. Compare like-for-like across technologies.
+
 #### 4.3: Bias Prevention (Forked Subagents)
 
 **CRITICAL:** Apply `references/bias-prevention.md` patterns:
@@ -274,6 +279,8 @@ For EACH scenario, evaluate:
 - Are there dealbreaker limitations for any technology in this scenario?
 
 Tag each technology for each scenario: **Best Fit**, **Runner-Up**, or **Poor Fit**.
+
+**Gap Mitigation:** Do NOT eliminate candidates solely because a feature is missing. Instead, estimate the effort required to build or contribute the missing capability (including with AI-assisted development), and factor that adjusted effort into the ranking. Only mark a gap as disqualifying if it is a `[FUNDAMENTAL]` architectural limitation that cannot be reasonably addressed.
 
 ---
 
@@ -420,7 +427,29 @@ If no single technology wins all CRITICAL scenarios:
 - Use conditional recommendations
 - Consider hybrid strategies (Pattern 4)
 
-### 6.3: Human Validation Checkpoint
+### 6.3: Self-Validation Loop
+
+**Before presenting to the user**, re-read the complete analysis and verify:
+
+1. **Consistency check:** Are there contradictions between claims made about different technologies?
+2. **Language fairness:** Is the language symmetric across candidates? (e.g., not using positive framing for one and neutral/negative for another describing equivalent capabilities)
+3. **Executive summary alignment:** Does the executive summary match the detailed findings? Are strategic decisions emphasized over implementation details?
+4. **Logical completeness:** Are there gaps in reasoning or unsupported jumps to conclusions?
+5. **Differentiation validity:** For any feature claimed as unique to one platform, verify competitors don't offer equivalent functionality under different names
+6. **Baseline consistency:** Were the same evaluation criteria and measurement standards applied to all platforms?
+
+If issues are found, correct them before proceeding.
+
+### 6.4: Decision Reversal Criteria
+
+For each recommendation, generate explicit conditions under which the recommendation would change:
+
+"This recommendation would change if:
+- [Specific condition 1, e.g., 'Technology B adds distributed training support']
+- [Specific condition 2, e.g., 'Dataset size exceeds single-node memory limits']
+- [Specific condition 3, e.g., 'Licensing terms change for Technology A']"
+
+### 6.5: Human Validation Checkpoint
 
 Before finalizing, present synthesis and ask:
 
@@ -449,7 +478,10 @@ Create `[comparison_name]_report.md`:
 
 ## Executive Summary
 
-[2-3 paragraph synthesis]
+[2-3 paragraph synthesis focused on STRATEGIC decisions: licensing implications,
+major architectural trade-offs, and governance considerations.
+Do NOT include implementation details, UI integration specifics, or technical
+minutiae here — save those for the technical sections below.]
 
 **Bottom Line:** [Primary recommendation with key trade-offs]
 
@@ -518,6 +550,50 @@ Create `[comparison_name]_report.md`:
 
 ---
 
+## Decision Reversal Criteria
+
+This recommendation would change if:
+- [Specific condition 1]
+- [Specific condition 2]
+- [Specific condition 3]
+
+---
+
+## Dissenting View
+
+**Strongest argument against the primary recommendation:**
+[Present the best case for an alternative choice — the most compelling counter-argument]
+
+**Rebuttal:**
+[Why the primary recommendation still holds despite this counter-argument]
+
+---
+
+## Cost Quantification (Optional)
+
+*Include this section only if the user requests cost analysis or if the comparison
+involves significant infrastructure or operational cost differences.*
+
+**Note:** These are relative cost comparisons, not absolute budget projections.
+Actual costs depend on scale, provider pricing, and organizational context.
+
+### Operational Cost Comparison
+
+| Cost Factor | Tech A | Tech B | Tech C |
+|-------------|--------|--------|--------|
+| Infrastructure overhead | [Low/Med/High] | [Low/Med/High] | [Low/Med/High] |
+| Engineering effort to adopt | [weeks estimate] | [weeks estimate] | [weeks estimate] |
+| Ongoing maintenance burden | [Low/Med/High] | [Low/Med/High] | [Low/Med/High] |
+| Required expertise level | [description] | [description] | [description] |
+| License/subscription costs | [OSS/Paid tier] | [OSS/Paid tier] | [OSS/Paid tier] |
+
+### Gap Remediation Effort
+
+[For each technology with missing features, break down the effort to build or
+contribute the missing capability into specific components with justification]
+
+---
+
 ## Sources Consulted
 
 [All URLs with access dates]
@@ -527,8 +603,11 @@ Create `[comparison_name]_report.md`:
 ## Methodology Notes
 
 - Positive and negative analysis conducted in separate forked contexts
-- All metrics fetched fresh on [date]
+- All metrics fetched fresh on [date] with cache bypass for quantitative data
+- Features tagged as [OSS] or [PAID/COMMERCIAL] throughout
+- Self-validation loop performed before presentation (consistency, fairness, baseline drift)
 - User-provided context integrated in Step 5
+- Gap mitigation applied: missing features assessed for build effort rather than automatic elimination
 ```
 
 ### 7.2: Generate Comparison Tables
@@ -618,11 +697,17 @@ List all generated files with sizes and brief description.
 1. **User scenarios first** - User defines scenarios, skill suggests additional relevant ones
 2. **Multi-scenario analysis** - Different technologies win different scenarios
 3. **No forced single winner** - Use conditional recommendations when trade-offs exist
-4. **Bias prevention** - Fork positive/negative subagents, always web search for fresh data
-5. **Scenario-specific recommendations** - Per-scenario winner matrix + conditional "Choose X if..."
-6. **Comprehensive output** - Markdown report, tables, decision matrix, presentation, PDFs
-7. **Human validation** - Checkpoints at scenario definition, synthesis, and before final output
-8. **Deep mode context reuse** - Ask project-swot Phase 0 questions once, provide to all subagents
+4. **Bias prevention** - Fork positive/negative subagents, always web search for fresh data, bypass caches for quantitative metrics
+5. **OSS/Commercial distinction** - Tag all features as [OSS] or [PAID/COMMERCIAL]; compare like-for-like
+6. **Differentiation verification** - Verify ALL platforms before claiming any feature is unique
+7. **Gap mitigation over elimination** - Estimate effort to fill gaps rather than eliminating candidates for missing features
+8. **Self-validation** - Re-read analysis for consistency, fairness, and baseline drift before presenting
+9. **Decision reversal criteria** - State conditions under which each recommendation would change
+10. **Dissenting viewpoints** - Present strongest counter-argument with rebuttal
+11. **Scenario-specific recommendations** - Per-scenario winner matrix + conditional "Choose X if..."
+12. **Comprehensive output** - Markdown report, tables, decision matrix, presentation, PDFs (optional cost quantification)
+13. **Human validation** - Checkpoints at scenario definition, synthesis, and before final output
+14. **Deep mode context reuse** - Ask project-swot Phase 0 questions once, provide to all subagents
 
 ---
 

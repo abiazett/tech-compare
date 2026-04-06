@@ -59,6 +59,60 @@ import sys
 from typing import Dict, List, Any, Tuple
 
 
+def normalize_data(data: Dict[str, Any]) -> Dict[str, Any]:
+    """Normalize input data to handle both flat and rich JSON formats.
+
+    Handles:
+    - technologies as list of strings OR list of dicts with 'name' key
+    - dimensions with 'scores' dict OR 'comparisons' with 'numeric_score'
+    - dimensions with or without 'weight' (defaults to IMPORTANT)
+    - scenarios with or without 'scores' dict (generates from best_fit/runner_up)
+    """
+    data = dict(data)  # shallow copy
+
+    # Normalize technologies: list of dicts -> list of strings
+    techs = data.get('technologies', [])
+    if techs and isinstance(techs[0], dict):
+        data['technologies'] = [t.get('name', str(t)) for t in techs]
+
+    technologies = data['technologies']
+
+    # Normalize dimensions
+    for dim in data.get('dimensions', []):
+        # Add default weight if missing
+        if 'weight' not in dim:
+            dim['weight'] = 'IMPORTANT'
+
+        # Convert 'scores' dict to 'comparisons' format
+        if 'scores' in dim and 'comparisons' not in dim:
+            dim['comparisons'] = {}
+            for tech, score in dim['scores'].items():
+                label = 'Excellent' if score >= 9 else 'Strong' if score >= 7 else 'Moderate' if score >= 5 else 'Limited' if score >= 3 else 'Weak'
+                dim['comparisons'][tech] = {'score': label, 'numeric_score': score}
+
+        # Ensure numeric_score exists in comparisons
+        if 'comparisons' in dim:
+            for tech, comp in dim['comparisons'].items():
+                if isinstance(comp, dict) and 'numeric_score' not in comp:
+                    comp['numeric_score'] = 5  # default
+
+    # Normalize scenarios: generate scores from best_fit/runner_up if missing
+    for scenario in data.get('scenarios', []):
+        if 'scores' not in scenario:
+            scenario['scores'] = {}
+            best = scenario.get('best_fit')
+            runner = scenario.get('runner_up')
+            for tech in technologies:
+                if tech == best:
+                    scenario['scores'][tech] = 9
+                elif tech == runner:
+                    scenario['scores'][tech] = 6
+                else:
+                    scenario['scores'][tech] = 3
+
+    return data
+
+
 # Priority weights
 PRIORITY_WEIGHTS = {
     "CRITICAL": 10,
@@ -332,6 +386,9 @@ def main():
     except json.JSONDecodeError as e:
         print(f"Error: Invalid JSON in input file: {e}")
         sys.exit(1)
+
+    # Normalize data to handle both flat and rich formats
+    data = normalize_data(data)
 
     # Generate decision matrix
     decision_matrix = generate_decision_matrix(data)

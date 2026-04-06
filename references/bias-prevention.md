@@ -19,8 +19,9 @@
 **Safeguard:**
 ✅ **ALWAYS use web search for current project state**
 ✅ **Tag all metrics with retrieval date:** `[VERIFIED-2026-03-27]`
-✅ **Trust current documentation over training data** when conflicts arise
+✅ **Trust current documentation over training data** when conflicts arise — especially for version-specific information. When web search results contradict training data, explicitly prioritize current documentation.
 ✅ **Explicitly state:** "As of [date], according to [source]..."
+✅ **Bypass caches for quantitative data:** When fetching metrics like GitHub stars, download counts, or contributor numbers, explicitly request fresh/uncached data. If returned values seem stale or round-numbered, re-fetch with explicit cache bypass instructions.
 
 ---
 
@@ -44,10 +45,11 @@
 - `"[project] criticism concerns"`
 - Check GitHub issues for recurring complaints
 
-✅ **Translate marketing language to technical specifics:**
+✅ **Translate ALL marketing language to specific technical requirements or capabilities — if a term cannot be technically defined, exclude it from the analysis:**
 - "Enterprise-grade" → What specific enterprise features? (RBAC, multi-tenancy, audit logs, SLAs?)
 - "Cloud-native" → Kubernetes CRDs? Operators? Stateless? 12-factor?
 - "Production-ready" → Who uses it in production? At what scale? With what success?
+- If a marketing term cannot be mapped to a concrete technical capability, **do not use it in the analysis**
 
 ---
 
@@ -182,6 +184,68 @@
 ✅ **Verify integration claims:**
 - "Works with Kubernetes" — Does it use CRDs/Operators or just "can run in a pod"?
 - "Supports PostgreSQL" — Native driver or requires middleware?
+
+---
+
+### 8. OSS vs Commercial Feature Conflation
+**Problem:** AI models mix open-source and paid/commercial features indiscriminately, making a technology appear more capable than its freely available version actually is.
+
+**Examples:**
+- Stating "Phoenix has annotation queues" when it's only in paid Arize AX
+- Listing enterprise SSO as a capability of the open-source edition
+- Comparing one project's OSS features against another's commercial tier
+
+**Safeguard:**
+✅ **Tag every feature as `[OSS]` or `[PAID/COMMERCIAL]`**
+✅ **Maintain separate sections** for open-source vs. commercial capabilities when the distinction matters for the comparison
+✅ **Compare like-for-like:** OSS features against OSS features, commercial against commercial
+✅ **Verify licensing tier:** Check whether a feature requires a paid plan, enterprise license, or managed-service subscription
+
+---
+
+### 9. False Feature Differentiation
+**Problem:** AI models claim a feature is a "differentiator" for one technology without checking whether competitors have equivalent functionality — often under different names or recently added.
+
+**Examples:**
+- Claiming Langfuse's session/conversation grouping is a differentiator without checking if MLflow and Phoenix have equivalent capabilities (they did)
+- Declaring Technology A has "native OTLP export" as unique when Technology B added it in a recent release
+
+**Safeguard:**
+✅ **For any feature claimed as a differentiator, explicitly verify ALL competing platforms for equivalent functionality** — features often exist under different names or were recently added
+✅ **Search for equivalent capability using functional descriptions**, not just feature names (e.g., search for "conversation tracking" not just "session grouping")
+✅ **Check recent release notes** of all platforms before declaring a feature unique
+
+---
+
+### 10. Incomplete System Path Analysis
+**Problem:** AI models evaluate surface-level API characteristics without analyzing the complete execution path, leading to misleading performance or architecture claims.
+
+**Examples:**
+- Praising Phoenix's non-blocking API layer efficiency without noting synchronous database writes downstream
+- Calling a system "async" based on its API surface while missing blocking operations in the full call path
+- Stating MLflow is "purely synchronous" while missing an async configuration flag
+
+**Safeguard:**
+✅ **When evaluating performance or architecture, analyze the complete system path** including all dependencies, middleware, and downstream operations — not just the surface-layer API
+✅ **Before making categorical statements about limitations**, thoroughly review all configuration flags, options, and modes
+✅ **Trace the full request lifecycle:** API → middleware → business logic → storage → response
+✅ **Verify architectural claims through code examination** when documentation is ambiguous
+
+---
+
+### 11. Comparison Baseline Drift
+**Problem:** Evaluation criteria or measurement standards change mid-analysis, leading to apples-to-oranges comparisons across platforms.
+
+**Examples:**
+- Comparing one system's burst capacity against another's sustained throughput
+- Switching from star-based decision matrices to checkmark tables without deliberate reasoning
+- Using different benchmark conditions for different platforms
+
+**Safeguard:**
+✅ **Establish evaluation criteria and measurement standards upfront** before beginning analysis
+✅ **Apply the same standards consistently across ALL compared platforms** — use identical measurement conditions
+✅ **If baselines must change mid-analysis, document explicitly:** what changed, why, and how it affects prior comparisons
+✅ **Maintain consistent analytical frameworks** (tables, scoring systems, rating scales) throughout — do not switch formats without stating the reason
 
 ---
 
@@ -395,12 +459,16 @@ These bias prevention measures integrate throughout the workflow:
 
 | Bias Type | Primary Safeguard |
 |-----------|-------------------|
-| **Training data recency** | Always web search; tag with dates |
+| **Training data recency** | Always web search; tag with dates; bypass caches for quantitative data |
 | **Positive bias** | Fork separate positive/negative subagents |
 | **Surface-level analysis** | Evaluate architecture, operations, TCO |
 | **Governance blindness** | Explicitly research license, funding, control |
 | **Overconfidence** | Tag claims [VERIFIED/CLAIMED/UNCERTAIN] |
 | **Stale benchmarks** | Fetch fresh data; note versions and dates |
 | **Ecosystem assumptions** | Ask user's constraints; verify compatibility |
+| **OSS/Commercial conflation** | Tag features [OSS] or [PAID]; compare like-for-like |
+| **False differentiation** | Verify ALL platforms before claiming a feature is unique |
+| **Incomplete system analysis** | Trace full execution path; review all config options |
+| **Baseline drift** | Establish criteria upfront; apply consistently across all platforms |
 
 **Default stance:** Trust current documentation over training data. Acknowledge uncertainty. Use conditional recommendations when trade-offs exist.

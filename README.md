@@ -7,8 +7,13 @@ A Claude Code skill for structured, unbiased comparison of 2-3 technologies acro
 Tech-Compare helps you make informed technology decisions by:
 - Comparing technologies across **your specific scenarios** (not forced general recommendations)
 - Using **forked subagents** to prevent bias (separate positive/negative analysis)
+- Distinguishing **[OSS] vs [PAID/COMMERCIAL]** features throughout
+- **Gap mitigation** over elimination — estimating effort to fill missing features rather than discarding candidates
+- **Self-validation loop** checking for consistency, fairness, and baseline drift before presenting results
+- Including **decision reversal criteria** and **dissenting viewpoints** for robust recommendations
 - Generating **comprehensive deliverables** (reports, tables, presentations, PDFs)
 - Supporting **two depth levels**: Quick (1-2h web research) or Deep (2-4h with full SWOT analysis)
+- Optional **cost quantification** (relative infrastructure, engineering, and maintenance comparisons)
 
 **Core Principle:** In technology comparisons, there is rarely a single "winner" across all scenarios. Different technologies excel at different use cases. This skill helps you understand **which technology fits which scenario**.
 
@@ -234,13 +239,13 @@ See `references/common-scenarios.md` for detailed scenarios per category.
 - Integration requirements and compatibility
 - Operational characteristics (monitoring, debugging, maintenance)
 
-**Explicitly excluded:**
+**Explicitly excluded (unless requested):**
 - Specific cost estimates or budgets (e.g., "$275K year 1")
 - ROI calculations or payback periods
 - Detailed implementation timelines with month-by-month breakdowns
 - Financial modeling or business case analysis
 
-If you need cost/timeline analysis, take the technical comparison output to your finance/planning teams.
+**Optional:** Relative cost quantification (infrastructure overhead, engineering effort, maintenance burden) can be included on request. See the Cost Quantification section in the report template.
 
 ---
 
@@ -251,12 +256,16 @@ The skill actively guards against common AI comparison pitfalls:
 | Pitfall | Prevention |
 |---------|------------|
 | **Outdated Knowledge** | Always web search; never rely on training data for metrics |
-| **Marketing Language** | Translate all claims to specific technical capabilities |
-| **Stale Metrics** | Fetch fresh data; include retrieval dates for all metrics |
+| **Marketing Language** | Translate to technical requirements or exclude from analysis |
+| **Stale Metrics** | Fetch fresh uncached data; include retrieval dates for all metrics |
 | **Anchoring Bias** | Forked subagents analyze positive/negative separately |
-| **Surface-Level Analysis** | Analyze complete architecture, not just API surface |
+| **Surface-Level Analysis** | Analyze complete system paths, not just API surface |
 | **Overconfidence** | Tag claims as [VERIFIED] or [CLAIMED]; acknowledge uncertainty |
 | **Governance Blindness** | Explicitly research project governance, not just features |
+| **OSS/Commercial Conflation** | Tag all features as [OSS] or [PAID]; compare like-for-like |
+| **False Differentiation** | Verify ALL platforms before claiming any feature is unique |
+| **Incomplete System Analysis** | Trace full execution paths; review all config options |
+| **Baseline Drift** | Establish criteria upfront; apply consistently across all platforms |
 
 See `references/bias-prevention.md` for detailed safeguards.
 
@@ -299,6 +308,7 @@ output/
 tech-compare/
 ├── SKILL.md                            # Main skill definition
 ├── README.md                           # This file
+├── CHANGELOG.md                        # Version history and changes
 ├── references/
 │   ├── comparison-dimensions.md        # 14 standard dimensions
 │   ├── common-scenarios.md             # Category-specific scenarios
@@ -364,5 +374,6 @@ For issues, questions, or contributions:
 
 ---
 
-**Last Updated:** 2026-03-29
-**Version:** 2.0 (Technical Focus)
+**Last Updated:** 2026-04-05
+**Version:** 2.1 (Methodology Hardening)
+**Changelog:** See [CHANGELOG.md](CHANGELOG.md)

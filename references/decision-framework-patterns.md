@@ -224,7 +224,9 @@ When technologies have different risk profiles, structure recommendations around
 
 ## Pattern 6: Gap Analysis with Migration Estimates
 
-When all options have weaknesses, quantify what needs to be built and effort required.
+**Core Philosophy:** Do NOT eliminate candidates solely because a feature is missing. Instead, estimate the effort required to build or contribute the missing capability (including with AI-assisted development), and factor that adjusted effort into the ranking. Only treat a gap as disqualifying if it is a `[FUNDAMENTAL]` architectural limitation that cannot be reasonably addressed.
+
+When all options have weaknesses, quantify what needs to be built and effort required. Break down effort estimates into specific technical components with justification for each — avoid broad estimates like "9-17 months" without component-level breakdown.
 
 ### Example Structure:
 

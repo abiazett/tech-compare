@@ -29,6 +29,36 @@ from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
 from pptx.dml.color import RGBColor
 
 
+def normalize_data(data: Dict[str, Any]) -> Dict[str, Any]:
+    """Normalize input data to handle both flat and rich JSON formats.
+
+    Handles:
+    - technologies as list of strings OR list of dicts with 'name' key
+    - dimensions with 'scores' dict OR 'comparisons' with 'numeric_score'
+    - dimensions with or without 'weight' (defaults to IMPORTANT)
+    """
+    data = dict(data)  # shallow copy
+
+    # Normalize technologies: list of dicts -> list of strings
+    techs = data.get('technologies', [])
+    if techs and isinstance(techs[0], dict):
+        data['technologies'] = [t.get('name', str(t)) for t in techs]
+
+    # Normalize dimensions
+    for dim in data.get('dimensions', []):
+        if 'weight' not in dim:
+            dim['weight'] = 'IMPORTANT'
+
+        # Convert 'scores' dict to 'comparisons' format
+        if 'scores' in dim and 'comparisons' not in dim:
+            dim['comparisons'] = {}
+            for tech, score in dim['scores'].items():
+                label = 'Excellent' if score >= 9 else 'Strong' if score >= 7 else 'Moderate' if score >= 5 else 'Limited' if score >= 3 else 'Weak'
+                dim['comparisons'][tech] = {'score': label, 'numeric_score': score}
+
+    return data
+
+
 # Brand colors
 PRIMARY_COLOR = RGBColor(238, 0, 0)  # Red Hat Red
 DARK_GRAY = RGBColor(51, 51, 51)
@@ -328,6 +358,9 @@ def main():
     except ImportError:
         print("Error: python-pptx not installed. Run: pip3 install python-pptx")
         sys.exit(1)
+
+    # Normalize data to handle both flat and rich formats
+    data = normalize_data(data)
 
     # Generate presentation
     prs = generate_presentation(data)
